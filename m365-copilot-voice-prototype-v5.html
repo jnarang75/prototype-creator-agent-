@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft 365 Copilot - Voice Chat Mobile Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #F3F2F1;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        :root {
+            --ms-blue: #0078D4;
+            --ms-blue-hover: #106EBE;
+            --ms-purple: #8B5CF6;
+            --ms-pink: #EC4899;
+            --ms-gray-10: #FAF9F8;
+            --ms-gray-20: #F3F2F1;
+            --ms-gray-30: #EDEBE9;
+            --ms-gray-50: #D2D0CE;
+            --ms-gray-90: #605E5C;
+            --ms-gray-130: #323130;
+            --ms-text: #323130;
+            --ms-text-secondary: #605E5C;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1440px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132), 0 0.3px 0.9px rgba(0,0,0,0.108);
+            overflow: hidden;
+            display: flex;
+            height: 90vh;
+            max-height: 900px;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--ms-gray-10);
+            border-right: 1px solid var(--ms-gray-30);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--ms-gray-30);
+        }
+
+        .sidebar-logo {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #0078D4, #50E6FF);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ms-text);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            margin-bottom: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--ms-text);
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: var(--ms-gray-20);
+        }
+
+        .nav-item.active {
+            background: var(--ms-gray-30);
+        }
+
+        .nav-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-section {
+            margin-top: 20px;
+            padding: 0 12px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--ms-gray-90);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid var(--ms-gray-30);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--ms-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-text);
+        }
+
+        /* Main Content Area */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--ms-gray-30);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tab {
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--ms-text-secondary);
+        }
+
+        .tab.active {
+            background: var(--ms-gray-20);
+            color: var(--ms-blue);
+        }
+
+        .tab:hover:not(.active) {
+            background: var(--ms-gray-10);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--ms-text-secondary);
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: var(--ms-gray-20);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Chat View */
+        .chat-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--ms-gray-10);
+        }
+
+        .messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+            margin-left: auto;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 16px;
+            background: linear-gradient(135deg, var(--ms-blue), #50E6FF);
+        }
+
+        .message.user .avatar {
+            background: var(--ms-gray-50);
+        }
+
+        .message-bubble {
+            max-width: 65%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132);
+        }
+
+        .message.assistant .message-bubble {
+            background: white;
+            color: var(--ms-text);
+        }
+
+        .message.user .message-bubble {
+            background: var(--ms-gray-20);
+            color: var(--ms-text);
+        }
+
+        /* Voice View */
+        .voice-view {
+            flex: 1;
+            background: linear-gradient(135deg, #8B5CF6 0%, #D946EF 50%, #EC4899 100%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 40px;
+            animation: voiceViewFade 0.4s ease;
+        }
+
+        .voice-view.active {
+            display: flex;
+        }
+
+        @keyframes voiceViewFade {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .voice-orb {
+            width: 140px;
+            height: 140px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 28px;
+            animation: orbPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes orbPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255,255,255,0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 25px rgba(255,255,255,0);
+            }
+        }
+
+        .voice-orb::before {
+            content: "🎤";
+            font-size: 56px;
+        }
+
+        .voice-status {
+            text-align: center;
+            color: white;
+            margin-bottom: 28px;
+        }
+
+        .voice-status h2 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .voice-status p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .suggestion-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            max-width: 700px;
+            margin-bottom: 32px;
+        }
+
+        .pill {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: white;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.2s;
+        }
+
+        .pill:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .end-voice-btn {
+            padding: 12px 32px;
+            background: white;
+            color: var(--ms-purple);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+
+        .end-voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        /* QR Nudge - Corner */
+        .qr-corner-nudge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(10px);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            max-width: 220px;
+            z-index: 100;
+            animation: nudgeSlide 0.4s ease;
+            display: none;
+        }
+
+        .qr-corner-nudge.show {
+            display: block;
+        }
+
+        @keyframes nudgeSlide {
+            from {
+                opacity: 0;
+                transform: translateX(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .nudge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .nudge-header h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-text);
+            line-height: 1.3;
+            flex: 1;
+            padding-right: 8px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--ms-gray-20);
+            color: var(--ms-text);
+        }
+
+        .qr-image {
+            width: 100%;
+            height: auto;
+            max-width: 100px;
+            margin: 10px auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .nudge-text {
+            font-size: 11px;
+            color: var(--ms-text-secondary);
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        /* Voice Icon Nudge */
+        .voice-icon-nudge {
+            position: absolute;
+            bottom: 70px;
+            right: 20px;
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            max-width: 280px;
+            z-index: 50;
+            animation: bounceIn 0.5s ease;
+            display: none;
+        }
+
+        .voice-icon-nudge.show {
+            display: block;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-8px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .voice-icon-nudge::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 25px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
+
+        .icon-nudge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .icon-nudge-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ms-text);
+            line-height: 1.3;
+            flex: 1;
+        }
+
+        .icon-nudge-content {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-nudge-qr {
+            width: 75px;
+            height: 75px;
+            flex-shrink: 0;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .icon-nudge-text {
+            flex: 1;
+        }
+
+        .icon-nudge-text p {
+            font-size: 12px;
+            color: var(--ms-text-secondary);
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .icon-nudge-text .cta {
+            font-size: 12px;
+            color: var(--ms-blue);
+            font-weight: 600;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 16px 24px;
+            background: white;
+            border-top: 1px solid var(--ms-gray-30);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            position: relative;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px 48px 12px 16px;
+            border: 1px solid var(--ms-gray-50);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+        }
+
+        .text-input::placeholder {
+            color: var(--ms-gray-90);
+        }
+
+        .voice-trigger {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--ms-blue);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .voice-trigger:hover {
+            background: var(--ms-blue-hover);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .voice-trigger.active {
+            background: #D13438;
+            animation: voicePulseBtn 1.5s ease-in-out infinite;
+        }
+
+        @keyframes voicePulseBtn {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(209,52,56,0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 6px rgba(209,52,56,0);
+            }
+        }
+
+        /* CSAT Inline */
+        .csat-bar {
+            display: none;
+            padding: 16px 24px;
+            background: white;
+            border-top: 1px solid var(--ms-gray-30);
+            align-items: center;
+            gap: 20px;
+            animation: csatSlide 0.3s ease;
+        }
+
+        .csat-bar.show {
+            display: flex;
+        }
+
+        @keyframes csatSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .csat-info {
+            flex: 1;
+        }
+
+        .csat-duration {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-text);
+            margin-bottom: 2px;
+        }
+
+        .csat-question {
+            font-size: 12px;
+            color: var(--ms-text-secondary);
+        }
+
+        .csat-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .csat-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--ms-gray-50);
+            background: white;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .csat-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--ms-blue);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .csat-btn.selected {
+            background: var(--ms-blue);
+            border-color: var(--ms-blue);
+            transform: scale(1.1);
+        }
+
+        .csat-qr-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: var(--ms-gray-10);
+            border-radius: 8px;
+            border: 1px solid var(--ms-gray-30);
+        }
+
+        .csat-qr-box img {
+            width: 60px;
+            height: 60px;
+            border-radius: 6px;
+        }
+
+        .csat-qr-text h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ms-text);
+            margin-bottom: 2px;
+        }
+
+        .csat-qr-text p {
+            font-size: 11px;
+            color: var(--ms-text-secondary);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: overlayFade 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes overlayFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 8px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25.6px 57.6px rgba(0,0,0,0.22);
+            animation: modalScale 0.3s ease;
+        }
+
+        @keyframes modalScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Start Voice Modal */
+        .start-modal h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--ms-text);
+            margin-bottom: 20px;
+        }
+
+        .voice-examples {
+            margin-bottom: 20px;
+        }
+
+        .example {
+            background: linear-gradient(135deg, #FFE5F4, #F0E5FF);
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--ms-text);
+            display: inline-block;
+        }
+
+        .modal-description {
+            font-size: 14px;
+            color: var(--ms-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal-qr-box {
+            background: var(--ms-gray-10);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--ms-gray-30);
+        }
+
+        .modal-qr-box img {
+            width: 90px;
+            height: 90px;
+            border-radius: 8px;
+            background: white;
+            padding: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+
+        .modal-qr-text {
+            flex: 1;
+        }
+
+        .modal-qr-text h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ms-text);
+            margin-bottom: 6px;
+        }
+
+        .modal-qr-text p {
+            font-size: 13px;
+            color: var(--ms-text-secondary);
+            line-height: 1.4;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--ms-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--ms-blue-hover);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--ms-text-secondary);
+            border: 1px solid var(--ms-gray-50);
+        }
+
+        .btn-secondary:hover {
+            background: var(--ms-gray-10);
+        }
+
+        /* CSAT Feedback Modal */
+        .feedback-modal h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ms-text);
+            margin-bottom: 10px;
+        }
+
+        .feedback-modal .subtitle {
+            font-size: 13px;
+            color: var(--ms-text-secondary);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .feedback-section {
+            margin-bottom: 24px;
+        }
+
+        .feedback-section h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ms-text);
+            margin-bottom: 14px;
+        }
+
+        .feedback-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .feedback-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .feedback-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+        }
+
+        .feedback-option label {
+            font-size: 13px;
+            color: var(--ms-text);
+            cursor: pointer;
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--ms-gray-50);
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 90px;
+            transition: all 0.2s;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: var(--ms-blue);
+        }
+
+        .qr-box-large {
+            background: var(--ms-gray-10);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--ms-gray-30);
+        }
+
+        .qr-box-large img {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            background: white;
+            padding: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .qr-box-text h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--ms-text);
+            margin-bottom: 6px;
+        }
+
+        .qr-box-text p {
+            font-size: 12px;
+            color: var(--ms-text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Demo Controls */
+        .demo-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            max-width: 360px;
+            z-index: 2000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .demo-panel h4 {
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: #50E6FF;
+        }
+
+        .demo-panel button {
+            display: block;
+            width: 100%;
+            margin-bottom: 8px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: left;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .demo-panel button:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(4px);
+        }
+
+        .demo-divider {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🤖</div>
+                <div class="sidebar-title">M365 Copilot</div>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="nav-item active">
+                    <span class="nav-icon">💬</span>
+                    <span>New chat</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span>Search</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">📚</span>
+                    <span>Library</span>
+                </div>
+                <div class="nav-item">
+                    <span class="nav-icon">✨</span>
+                    <span>Create</span>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Agents</div>
+                    <div class="nav-item">
+                        <span class="nav-icon">🔬</span>
+                        <span>Researcher</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">📊</span>
+                        <span>Analyst</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">🤝</span>
+                        <span>New agent</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">⋯</span>
+                        <span>All agents</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Notebooks</div>
+                    <div class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        <span>Project Keystone</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        <span>Executive Reviews</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">📝</span>
+                        <span>Vacation Planning</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">⋯</span>
+                        <span>All notebooks</span>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Chats</div>
+                    <div class="nav-item">
+                        <span class="nav-icon">💼</span>
+                        <span>Lowest performing store</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">💼</span>
+                        <span>RFP for new market strategies...</span>
+                    </div>
+                    <div class="nav-item">
+                        <span class="nav-icon">💼</span>
+                        <span>Follow-up Tasks for Meeting</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">E</div>
+                <div class="user-info">
+                    <div class="user-name">Erika Fuller</div>
+                </div>
+                <button class="icon-btn">⚙️</button>
+            </div>
+        </div>
+
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-tabs">
+                    <div class="tab active">Work</div>
+                    <div class="tab">Web</div>
+                </div>
+                <div class="header-actions">
+                    <button class="icon-btn" title="New chat">➕</button>
+                    <button class="icon-btn" title="Notifications">🔔</button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Chat View -->
+                <div class="chat-view" id="chatView">
+                    <div class="messages" id="messages">
+                        <div class="message assistant">
+                            <div class="avatar">🤖</div>
+                            <div class="message-bubble">
+                                Hello! I'm your Microsoft 365 Copilot. I can help you with your work, answer questions, and assist with tasks. Try using voice for a more natural conversation experience!
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CSAT Bar -->
+                    <div class="csat-bar" id="csatBar">
+                        <div class="csat-info">
+                            <div class="csat-duration">Voice chat ended: 0m 22s</div>
+                            <div class="csat-question">How was your voice chat?</div>
+                        </div>
+                        <div class="csat-actions">
+                            <button class="csat-btn" data-rating="down" title="Not helpful">👎</button>
+                            <button class="csat-btn" data-rating="up" title="Helpful">👍</button>
+                        </div>
+                        <div class="csat-qr-box">
+                            <img src="C:\Users\rapatha\OneDrive - Microsoft\Mockups\Voice\QR.png" alt="QR Code">
+                            <div class="csat-qr-text">
+                                <h4>Talk to Copilot on the go</h4>
+                                <p>Download the app on mobile</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="input-area">
+                        <!-- Voice Icon Nudge -->
+                        <div class="voice-icon-nudge" id="voiceIconNudge">
+                            <div class="icon-nudge-header">
+                                <h3>Also available on mobile for commute scenarios</h3>
+                                <button class="close-btn" id="closeIconNudge">×</button>
+                            </div>
+                            <div class="icon-nudge-content">
+                                <img src="C:\Users\rapatha\OneDrive - Microsoft\Mockups\Voice\QR.png" alt="QR Code" class="icon-nudge-qr">
+                                <div class="icon-nudge-text">
+                                    <p>Scan to download the mobile app</p>
+                                    <div class="cta">Try it now →</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input-wrapper">
+                            <input type="text" class="text-input" placeholder="Message Copilot">
+                            <button class="voice-trigger" id="voiceTrigger" title="Start voice chat">🎤</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice View -->
+                <div class="voice-view" id="voiceView">
+                    <div class="voice-orb"></div>
+                    <div class="voice-status">
+                        <h2 id="voiceStatusText">Listening...</h2>
+                        <p>Speak naturally, I'm here to help</p>
+                    </div>
+
+                    <div class="suggestion-pills" id="suggestionPills">
+                        <div class="pill">Did I have any meetings today?</div>
+                        <div class="pill">Summarize my last email thread</div>
+                        <div class="pill">Help me plan a project timeline</div>
+                    </div>
+
+                    <button class="end-voice-btn" id="endVoiceBtn">End voice chat</button>
+
+                    <!-- QR Corner Nudge -->
+                    <div class="qr-corner-nudge" id="qrCornerNudge">
+                        <div class="nudge-header">
+                            <h3>Talk to Copilot on the go</h3>
+                            <button class="close-btn" id="closeQrCorner">×</button>
+                        </div>
+                        <img src="C:\Users\rapatha\OneDrive - Microsoft\Mockups\Voice\QR.png" alt="QR Code" class="qr-image">
+                        <p class="nudge-text">Scan for voice on mobile</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Start Voice -->
+    <div class="modal-overlay" id="startVoiceModal">
+        <div class="modal start-modal">
+            <h2>Speak with Copilot</h2>
+
+            <div class="voice-examples">
+                <div class="example">🌸 今日の目ニュース、教えて</div>
+                <div class="example">💭 Let's brainstorm together!</div>
+                <div class="example">✈️ To peux m'aider à organiser un voyage</div>
+            </div>
+
+            <p class="modal-description">
+                Voice chat lets you speak naturally to guide the conversation, get answers, collaborate, and more.
+            </p>
+
+            <div class="modal-qr-box">
+                <img src="C:\Users\rapatha\OneDrive - Microsoft\Mockups\Voice\QR.png" alt="QR Code">
+                <div class="modal-qr-text">
+                    <h4>Try on mobile</h4>
+                    <p>Scan to download the app and enjoy voice chat on the go</p>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="cancelStartVoice">Cancel</button>
+                <button class="btn btn-primary" id="startVoiceConfirm">Start a voice chat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: CSAT Feedback -->
+    <div class="modal-overlay" id="feedbackModal">
+        <div class="modal feedback-modal">
+            <h2>Submit feedback on Copilot</h2>
+            <p class="subtitle">
+                Setting up an AI assistant on your office system usually depends on your company's IT policies and tools.
+            </p>
+
+            <div class="feedback-section">
+                <h3>Add more details</h3>
+                <div class="feedback-options">
+                    <div class="feedback-option">
+                        <input type="checkbox" id="captureScreen">
+                        <label for="captureScreen">Capture screenshot</label>
+                    </div>
+                </div>
+                <textarea class="feedback-textarea" placeholder="Do not include any private or personal information"></textarea>
+            </div>
+
+            <div class="qr-box-large">
+                <img src="C:\Users\rapatha\OneDrive - Microsoft\Mockups\Voice\QR.png" alt="QR Code">
+                <div class="qr-box-text">
+                    <h4>Talk to Copilot on the go</h4>
+                    <p>Download the app on mobile and get more details about your setup at any time you want. Feel free to ask.</p>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="cancelFeedback">Cancel</button>
+                <button class="btn btn-primary" id="submitFeedback">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-panel">
+        <h4>🎮 Interactive Demo</h4>
+        <button id="demo1">1️⃣ Show Voice Icon Nudge</button>
+        <button id="demo2">2️⃣ Click Voice → Modal with QR</button>
+        <button id="demo3">3️⃣ Voice Before Question (QR Corner)</button>
+        <button id="demo4">4️⃣ Voice After Question (QR Corner)</button>
+        <div class="demo-divider"></div>
+        <button id="demo5">5️⃣ End Voice → CSAT Bar</button>
+        <button id="demo6">6️⃣ Click CSAT → Feedback Modal</button>
+        <div class="demo-divider"></div>
+        <button id="resetDemo">🔄 Reset Demo</button>
+    </div>
+
+    <script>
+        // Elements
+        const voiceTrigger = document.getElementById('voiceTrigger');
+        const voiceIconNudge = document.getElementById('voiceIconNudge');
+        const closeIconNudge = document.getElementById('closeIconNudge');
+        const startVoiceModal = document.getElementById('startVoiceModal');
+        const cancelStartVoice = document.getElementById('cancelStartVoice');
+        const startVoiceConfirm = document.getElementById('startVoiceConfirm');
+
+        const chatView = document.getElementById('chatView');
+        const voiceView = document.getElementById('voiceView');
+        const voiceStatusText = document.getElementById('voiceStatusText');
+        const suggestionPills = document.getElementById('suggestionPills');
+        const endVoiceBtn = document.getElementById('endVoiceBtn');
+        const qrCornerNudge = document.getElementById('qrCornerNudge');
+        const closeQrCorner = document.getElementById('closeQrCorner');
+
+        const csatBar = document.getElementById('csatBar');
+        const csatBtns = document.querySelectorAll('.csat-btn');
+
+        const feedbackModal = document.getElementById('feedbackModal');
+        const cancelFeedback = document.getElementById('cancelFeedback');
+        const submitFeedback = document.getElementById('submitFeedback');
+
+        const messages = document.getElementById('messages');
+
+        // Demo buttons
+        const demo1 = document.getElementById('demo1');
+        const demo2 = document.getElementById('demo2');
+        const demo3 = document.getElementById('demo3');
+        const demo4 = document.getElementById('demo4');
+        const demo5 = document.getElementById('demo5');
+        const demo6 = document.getElementById('demo6');
+        const resetDemo = document.getElementById('resetDemo');
+
+        let isVoiceActive = false;
+
+        // Show voice icon nudge on load
+        setTimeout(() => {
+            voiceIconNudge.classList.add('show');
+        }, 1500);
+
+        // Close icon nudge
+        closeIconNudge.addEventListener('click', () => {
+            voiceIconNudge.classList.remove('show');
+        });
+
+        // Voice icon click
+        voiceTrigger.addEventListener('click', () => {
+            voiceIconNudge.classList.remove('show');
+            startVoiceModal.classList.add('show');
+        });
+
+        cancelStartVoice.addEventListener('click', () => {
+            startVoiceModal.classList.remove('show');
+        });
+
+        startVoiceConfirm.addEventListener('click', () => {
+            startVoiceModal.classList.remove('show');
+            activateVoice(true, true);
+        });
+
+        // Activate voice chat
+        function activateVoice(showQR = false, showSuggestions = true) {
+            isVoiceActive = true;
+            chatView.style.display = 'none';
+            voiceView.classList.add('active');
+            voiceTrigger.classList.add('active');
+
+            if (showSuggestions) {
+                suggestionPills.style.display = 'flex';
+                voiceStatusText.textContent = 'Listening...';
+            } else {
+                suggestionPills.style.display = 'none';
+                voiceStatusText.textContent = 'Thinking...';
+            }
+
+            if (showQR) {
+                setTimeout(() => {
+                    qrCornerNudge.classList.add('show');
+                }, 1500);
+            }
+        }
+
+        // End voice chat
+        endVoiceBtn.addEventListener('click', () => {
+            deactivateVoice();
+        });
+
+        function deactivateVoice() {
+            isVoiceActive = false;
+            voiceView.classList.remove('active');
+            chatView.style.display = 'flex';
+            voiceTrigger.classList.remove('active');
+            qrCornerNudge.classList.remove('show');
+
+            csatBar.classList.add('show');
+            addMessage('assistant', "I found three meetings for you tomorrow: Growth Commercial Team Scrum at 12 PM, Copilot Mobile App Planning sync at 3:05 PM, and IRIS Feature requests at 3:30 PM. Would you like more details?");
+        }
+
+        // Close QR corner
+        closeQrCorner.addEventListener('click', () => {
+            qrCornerNudge.classList.remove('show');
+        });
+
+        // CSAT buttons
+        csatBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                csatBtns.forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+
+                setTimeout(() => {
+                    feedbackModal.classList.add('show');
+                }, 600);
+            });
+        });
+
+        // Feedback modal
+        cancelFeedback.addEventListener('click', () => {
+            feedbackModal.classList.remove('show');
+        });
+
+        submitFeedback.addEventListener('click', () => {
+            feedbackModal.classList.remove('show');
+            csatBar.classList.remove('show');
+            alert('✨ Thank you for your feedback!\n\nYour input helps us improve Microsoft 365 Copilot.');
+        });
+
+        // Add message helper
+        function addMessage(type, text) {
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = `
+                <div class="avatar">${type === 'user' ? '👤' : '🤖'}</div>
+                <div class="message-bubble">${text}</div>
+            `;
+            messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Demo controls
+        demo1.addEventListener('click', () => {
+            voiceIconNudge.classList.add('show');
+        });
+
+        demo2.addEventListener('click', () => {
+            voiceIconNudge.classList.remove('show');
+            startVoiceModal.classList.add('show');
+        });
+
+        demo3.addEventListener('click', () => {
+            startVoiceModal.classList.remove('show');
+            voiceIconNudge.classList.remove('show');
+            activateVoice(true, true);
+        });
+
+        demo4.addEventListener('click', () => {
+            startVoiceModal.classList.remove('show');
+            voiceIconNudge.classList.remove('show');
+            activateVoice(true, false);
+        });
+
+        demo5.addEventListener('click', () => {
+            if (isVoiceActive) {
+                deactivateVoice();
+            } else {
+                csatBar.classList.add('show');
+            }
+        });
+
+        demo6.addEventListener('click', () => {
+            feedbackModal.classList.add('show');
+        });
+
+        resetDemo.addEventListener('click', () => {
+            location.reload();
+        });
+
+        // Suggestion pills
+        document.querySelectorAll('.pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                suggestionPills.style.display = 'none';
+                voiceStatusText.textContent = 'Thinking...';
+            });
+        });
+    </script>
+</body>
+</html>

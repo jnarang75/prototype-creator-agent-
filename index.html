@@ -126,6 +126,55 @@
             opacity: 0.9;
         }
 
+        .demo-link-section {
+            margin-top: 40px;
+            padding: 24px 32px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .demo-link-section:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .demo-link-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .demo-link-text {
+            font-size: 15px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 16px;
+        }
+
+        .demo-link-btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .demo-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            background: #FFD700;
+        }
+
         /* Floating Icons */
         .floating-icons {
             position: fixed;
@@ -895,10 +944,45 @@
             font-size: 20px;
             font-weight: 600;
             color: var(--ms-text);
-            margin-bottom: 24px;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .faq-title:hover {
+            background: rgba(0,120,212,0.05);
+        }
+
+        .faq-title-text {
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .faq-toggle {
+            font-size: 24px;
+            transition: transform 0.3s;
+        }
+
+        .faq-toggle.expanded {
+            transform: rotate(180deg);
+        }
+
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, margin-top 0.3s ease;
+            margin-top: 0;
+        }
+
+        .faq-content.expanded {
+            max-height: 2000px;
+            margin-top: 24px;
         }
 
         .faq-item {
@@ -1064,14 +1148,10 @@
                     </div>
                     <div class="step" data-step="2">
                         <div class="step-number">2</div>
-                        <div class="step-label">Scenarios</div>
+                        <div class="step-label">Scenarios & References</div>
                     </div>
                     <div class="step" data-step="3">
                         <div class="step-number">3</div>
-                        <div class="step-label">References</div>
-                    </div>
-                    <div class="step" data-step="4">
-                        <div class="step-number">4</div>
                         <div class="step-label">Generate</div>
                     </div>
                 </div>
@@ -1130,7 +1210,7 @@
                 <!-- Step 2: User Scenarios -->
                 <div class="form-section" id="step2">
                     <h2>Define User Scenarios</h2>
-                    <p class="subtitle">Describe the step-by-step user journey for your prototype</p>
+                    <p class="subtitle">Describe the step-by-step user journey and optionally provide design mockups</p>
 
                     <div class="form-group">
                         <label>Add User Scenarios <span class="required">*</span></label>
@@ -1145,18 +1225,7 @@
                         <!-- Scenarios will be added here -->
                     </div>
 
-                    <div class="button-group">
-                        <button class="btn btn-secondary" onclick="previousStep(1)">← Previous</button>
-                        <button class="btn btn-primary" onclick="nextStep(3)">Next →</button>
-                    </div>
-                </div>
-
-                <!-- Step 3: Mock References -->
-                <div class="form-section" id="step3">
-                    <h2>Add Mock References</h2>
-                    <p class="subtitle">Optionally provide design mockups or screenshots for reference</p>
-
-                    <div class="form-group">
+                    <div class="form-group" style="margin-top: 32px;">
                         <label>Mock Folder Path <span class="optional">(Optional)</span></label>
                         <input type="text" id="mockPath" placeholder="C:\Users\yourname\Mockups\ProjectName">
                         <div class="helper-text">
@@ -1170,13 +1239,13 @@
                     </div>
 
                     <div class="button-group">
-                        <button class="btn btn-secondary" onclick="previousStep(2)">← Previous</button>
-                        <button class="btn btn-primary" onclick="nextStep(4)">Generate Prompt →</button>
+                        <button class="btn btn-secondary" onclick="previousStep(1)">← Previous</button>
+                        <button class="btn btn-primary" onclick="nextStep(3)">Generate Prompt →</button>
                     </div>
                 </div>
 
-                <!-- Step 4: Success & Output -->
-                <div class="form-section" id="step4">
+                <!-- Step 3: Success & Output -->
+                <div class="form-section" id="step3">
                     <div class="success-screen">
                         <div class="success-icon">🎉</div>
                         <div class="success-title">Your Prompt is Ready!</div>
@@ -1212,12 +1281,16 @@
                     </div>
 
                     <div class="faq-section">
-                        <div class="faq-title">
-                            <span>❓</span>
-                            <span>Frequently Asked Questions</span>
+                        <div class="faq-title" onclick="toggleFAQ()">
+                            <div class="faq-title-text">
+                                <span>❓</span>
+                                <span>Frequently Asked Questions</span>
+                            </div>
+                            <span class="faq-toggle">▼</span>
                         </div>
 
-                        <div class="faq-item">
+                        <div class="faq-content" id="faqContent">
+                            <div class="faq-item">
                             <div class="faq-question">
                                 <span class="faq-icon">1.</span>
                                 <span>How do I install Claude CLI?</span>
@@ -1266,14 +1339,26 @@
                                 Email your feedback, suggestions, or questions to <a href="mailto:rapatha@microsoft.com">rapatha@microsoft.com</a>. We'd love to hear how this tool is working for you!
                             </div>
                         </div>
+                        </div>
                     </div>
 
                     <div class="button-group">
-                        <button class="btn btn-secondary" onclick="previousStep(3)">← Previous</button>
+                        <button class="btn btn-secondary" onclick="previousStep(2)">← Previous</button>
                         <button class="btn btn-primary" onclick="startOver()">🔄 Create Another Prototype</button>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Demo Link Section -->
+    <div style="text-align: center; margin: 60px auto 40px; position: relative; z-index: 1;">
+        <div class="demo-link-section">
+            <div class="demo-link-title">🎨 See a Live Demo</div>
+            <div class="demo-link-text">Want to see what this tool can create? Check out a sample prototype!</div>
+            <a href="m365-copilot-voice-prototype-v5.html" target="_blank" class="demo-link-btn">
+                🔗 View Demo Prototype
+            </a>
         </div>
     </div>
 
@@ -1283,13 +1368,13 @@
         <div class="testimonial-grid">
             <div class="testimonial-card">
                 <div class="testimonial-quote">
-                    "Rakesh created a prototype in <strong>10 minutes</strong> and saved a <strong>3-day cycle</strong> of design iteration. Game changer for our sprint planning!"
+                    "I created a prototype in <strong>10 minutes</strong> and saved a <strong>3-day cycle</strong> of design iteration. Game changer for our sprint planning!"
                 </div>
                 <div class="testimonial-author">
-                    <div class="author-avatar">R</div>
+                    <div class="author-avatar">A</div>
                     <div class="author-info">
-                        <div class="author-name">Rakesh Pathak</div>
-                        <div class="author-title">Principal Product Manager, Microsoft</div>
+                        <div class="author-name">Anonymous PM</div>
+                        <div class="author-title">Product Manager, Microsoft</div>
                     </div>
                     <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
                 </div>
@@ -1337,7 +1422,7 @@
 
         // Update progress bar
         function updateProgress() {
-            const progress = ((currentStep - 1) / 3) * 100;
+            const progress = ((currentStep - 1) / 2) * 100;
             document.getElementById('stepProgress').style.width = progress + '%';
         }
 
@@ -1418,7 +1503,7 @@
             currentStep = step;
             updateProgress();
 
-            if (step === 4) {
+            if (step === 3) {
                 generatePrompt();
             }
 
@@ -1453,7 +1538,7 @@
         function collectStepData(step) {
             if (step === 1) {
                 formData.appName = document.getElementById('appName').value.trim();
-            } else if (step === 3) {
+            } else if (step === 2) {
                 formData.mockPath = document.getElementById('mockPath').value.trim();
                 formData.designNotes = document.getElementById('designNotes').value.trim();
             }
@@ -1523,6 +1608,20 @@
             document.querySelectorAll('.platform-option').forEach(o => o.classList.remove('selected'));
             renderScenarios();
             nextStep(1);
+        }
+
+        // Toggle FAQ section
+        function toggleFAQ() {
+            const content = document.getElementById('faqContent');
+            const toggle = document.querySelector('.faq-toggle');
+
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                toggle.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                toggle.classList.add('expanded');
+            }
         }
 
         // Initialize
